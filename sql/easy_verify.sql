@@ -11,11 +11,42 @@
  Target Server Version : 80036 (8.0.36)
  File Encoding         : 65001
 
- Date: 06/12/2024 17:08:36
+ Date: 17/12/2024 22:01:48
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for easy_card
+-- ----------------------------
+DROP TABLE IF EXISTS `easy_card`;
+CREATE TABLE `easy_card`  (
+  `cid` int NOT NULL AUTO_INCREMENT COMMENT '卡密ID',
+  `pid` int NOT NULL COMMENT '程序ID',
+  `uid` int NOT NULL COMMENT '创建用户ID',
+  `card_key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '卡密字段',
+  `card_type` int NULL DEFAULT 1 COMMENT '卡密类型\r\n1.天卡\r\n2.周卡\r\n3.月卡\r\n4.半年卡\r\n5.年卡\r\n6.永久卡\r\n7.自定义时间卡',
+  `card_time` int NOT NULL DEFAULT 1 COMMENT '卡密倍率',
+  `bind_imei` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '绑定设备标识',
+  `bind_ip` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '最后登录IP',
+  `first_bind_time` datetime NULL DEFAULT NULL COMMENT '第一次登录时间',
+  `create_time` datetime NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '第一次创建卡密时间',
+  `last_use_time` datetime NULL DEFAULT NULL COMMENT '最后一次登录时间',
+  `end_time` datetime NULL DEFAULT NULL COMMENT '到期时间',
+  `use_number` int NOT NULL DEFAULT 0 COMMENT '使用次数',
+  `unbind_number` int NOT NULL DEFAULT 0 COMMENT '解绑次数',
+  `imei_check` int NULL DEFAULT 2 COMMENT '是否开启设备码验证',
+  `ip_check` int NULL DEFAULT 1 COMMENT '是否开启网络IP验证',
+  `introduction` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '卡密备注',
+  `core_date` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '核心数据，卡密标记内容',
+  `limit_use_number` int NOT NULL DEFAULT 0 COMMENT '限制使用次数',
+  `limit_unbind_number` int NOT NULL DEFAULT 0 COMMENT '限制解绑次数',
+  `need_imei` int NOT NULL DEFAULT 1 COMMENT '是否需要设备码',
+  `state` int NULL DEFAULT 1 COMMENT '是否拉黑',
+  `deleted` int NULL DEFAULT 0 COMMENT '逻辑删除',
+  PRIMARY KEY (`cid`, `card_key`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 224 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for easy_link
@@ -33,7 +64,7 @@ CREATE TABLE `easy_link`  (
   PRIMARY KEY (`aid`, `link`) USING BTREE,
   INDEX `project_id_link`(`project_id` ASC) USING BTREE,
   CONSTRAINT `project_id_link` FOREIGN KEY (`project_id`) REFERENCES `easy_project` (`project_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 57 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 60 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for easy_permission
@@ -55,6 +86,7 @@ CREATE TABLE `easy_project`  (
   `project_user` int NOT NULL COMMENT '创建程序的用户',
   `project_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '创建程序的名称',
   `project_create_time` datetime NOT NULL COMMENT '程序创建的时间',
+  `project_model` int NULL DEFAULT 1 COMMENT '程序的模式 \r\n1. 收费模式\r\n2. 免费模式\r\n3. 加时模式',
   `project_key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '程序对接的密钥',
   `project_message` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '程序的一些简介',
   `project_notice` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '程序的公告',
