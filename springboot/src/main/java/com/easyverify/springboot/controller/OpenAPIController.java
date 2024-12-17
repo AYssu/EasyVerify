@@ -9,8 +9,10 @@ import com.easyverify.springboot.entity.EasyLink;
 import com.easyverify.springboot.entity.EasyProject;
 import com.easyverify.springboot.service.OpenAPIService;
 import com.easyverify.springboot.service.ProjectService;
+import com.easyverify.springboot.utils.IpUtil;
 import com.easyverify.springboot.utils.Sutils;
 import com.easyverify.springboot.vo.ResponseResult;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,8 +110,9 @@ public class OpenAPIController {
     }
 
     @PostMapping("/{base}")
-    public ResponseResult<?> open_api(@PathVariable String base,@RequestBody @Validated OpenAPIDTO openAPIDTO)
+    public ResponseResult<?> open_api(@PathVariable String base, @RequestBody @Validated OpenAPIDTO openAPIDTO, HttpServletRequest request)
     {
+        String ip = IpUtil.getIpAddr(request);
         log.info("open_api object: {}",openAPIDTO);
         // 还原pid
         try {
@@ -149,7 +152,6 @@ public class OpenAPIController {
                 send_time = rsa.decryptStr(Sutils.hex_to_string(openAPIDTO.getTime()), KeyType.PrivateKey);
 
             long alive_time = Math.abs(now_time - Long.parseLong(send_time));
-            log.info("alive_time: {}",alive_time);
             if (alive_time > 10)
             {
                 return ResponseResult.fail("客户端请求超时");
@@ -159,8 +161,8 @@ public class OpenAPIController {
             switch(link.getType()) {
                 case 1:
                 {
+                    return openAPIService.check_card(project,openAPIDTO,link,rsa,ip);
                 }
-                break;
                 case 2:
                 {
                 }

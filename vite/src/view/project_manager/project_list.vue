@@ -1411,7 +1411,7 @@ const random_type = () => {
  */
 const export_text = async (text: any) => {
 	const encoder = new TextEncoder();
-	const uint8r_array = encoder.encode(text);
+	const uint8r_array: any = encoder.encode(text);
 
 	// 将Uint8Array转换为二进制字符串
 	const binary_string = String.fromCharCode.apply(null, uint8r_array);

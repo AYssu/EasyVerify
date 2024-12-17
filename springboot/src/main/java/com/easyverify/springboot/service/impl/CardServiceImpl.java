@@ -20,6 +20,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -62,16 +63,15 @@ public class CardServiceImpl extends ServiceImpl<CardMapper, EasyCard> implement
                     record.setEndTime(LocalDateTime.now());
                 // 自定义卡默认激活
                 LocalDateTime localDateTime = record.getEndTime();
-                cardVo.setEndTime(localDateTime);
                 boolean isActive = localDateTime.isBefore(LocalDateTime.now());
+                cardVo.setEndTime(localDateTime);
                 cardVo.setCardStatus(isActive?2:3);
             }else {
                 if (record.getFirstBindTime()==null)
                 {
                     cardVo.setCardStatus(1);
                 }else {
-                    LocalDateTime localDateTime = getTime(record);
-                    cardVo.setEndTime(localDateTime);
+                    LocalDateTime localDateTime = record.getEndTime();
                     boolean isActive = localDateTime.isBefore(LocalDateTime.now());
                     cardVo.setCardStatus(isActive?2:3);
                 }
@@ -86,24 +86,6 @@ public class CardServiceImpl extends ServiceImpl<CardMapper, EasyCard> implement
         return pageBean;
     }
 
-    private static LocalDateTime getTime(EasyCard record) {
-        LocalDateTime localDateTime = record.getFirstBindTime();
-        Integer cardTime = record.getCardTime();
-        if (record.getCardType()==1)
-            localDateTime = localDateTime.plusDays(cardTime);
-        else if (record.getCardType()==2)
-            localDateTime = localDateTime.plusWeeks(cardTime);
-        else if (record.getCardType()==3)
-            localDateTime = localDateTime.plusMonths(cardTime);
-        else if (record.getCardType()==4)
-            localDateTime = localDateTime.plusMonths(6L * cardTime);
-        else if (record.getCardType()==5)
-            localDateTime = localDateTime.plusYears(cardTime);
-        else if (record.getCardType()==6)
-            localDateTime = localDateTime.plusYears(10);
-        return localDateTime;
-    }
-
     @Override
     public EasyProject get_project_by_id(Integer id) {
         EasyProject project = (EasyProject) redisTemplate.opsForValue().get("open_project_" + id);
@@ -113,6 +95,38 @@ public class CardServiceImpl extends ServiceImpl<CardMapper, EasyCard> implement
         project = projectMapper.selectById(id);
         redisTemplate.opsForValue().set("open_project_" + id, project, 30, TimeUnit.MINUTES);
         return project;
+    }
+
+    @Override
+    public boolean update_card_info(Integer cid, String bindImei, String bindIp, Integer imeiCheck,Integer ipCheck, String endTime, String introduction, String coreDate) {
+        EasyUser user = userService.get_user_by_jwt();
+        EasyCard card = cardMapper.selectById(cid);
+        if (card == null || !card.getUid().equals(user.getUserId()))
+            throw new RuntimeException("卡密不存在,越权操作");
+
+        card.setBindImei(bindImei);
+        card.setBindIp(bindIp);
+        card.setImeiCheck(imeiCheck);
+        card.setIpCheck(ipCheck);
+        if (endTime != null)
+        {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime dateTime = LocalDateTime.parse(endTime, formatter);
+            card.setEndTime(dateTime);
+        }
+        card.setIntroduction(introduction);
+        card.setCoreDate(coreDate);
+        return cardMapper.updateById(card) > 0;
+    }
+
+    @Override
+    public boolean card_ban(Integer cid) {
+        EasyUser user = userService.get_user_by_jwt();
+        EasyCard card = cardMapper.selectById(cid);
+        if (card == null || !card.getUid().equals(user.getUserId()))
+            throw new RuntimeException("卡密不存在,越权操作");
+        card.setState(card.getState()==1?2:1);
+        return cardMapper.updateById(card) > 0;
     }
 
 }

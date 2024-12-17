@@ -73,4 +73,16 @@ public interface OpenAPIService {
      * @return 项目变量信息
      */
     ResponseResult<?> get_project_variable(EasyProject project, OpenAPIDTO openAPIDTO, EasyLink link, RSA rsa);
+
+    /**
+     * 获取项目卡片信息
+     *
+     * @param project    项目信息
+     * @param openAPIDTO 请求参数
+     * @param link       链接类型
+     * @param rsa        RSA加密工具
+     * @param ip         请求IP
+     * @return 项目卡片信息
+     */
+    ResponseResult<?> check_card(EasyProject project, OpenAPIDTO openAPIDTO, EasyLink link, RSA rsa, String ip);
 }

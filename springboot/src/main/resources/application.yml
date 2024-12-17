@@ -48,4 +48,4 @@ mybatis-plus:
 # 随机编码 改了之后所有的url加密字段都会改变
 encrypt:
   base64: Yv49zklFRh0V2Km5uSoqOZjbP6pywdDC/e7EgUGWM+XrHAaLxI3i1BTctJnQNf8s
-
+  jwt: nbaya

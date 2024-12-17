@@ -35,7 +35,6 @@ public class EasyInterceptor implements HandlerInterceptor {
 
         response.setContentType("application/json;charset=utf-8");
         String authorization = request.getHeader("Authorization");
-        log.info("Authorization:"+authorization);
         try {
             String s = redisTemplate.opsForValue().get(authorization);
             if (s == null) {

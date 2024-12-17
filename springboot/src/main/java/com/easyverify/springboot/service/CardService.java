@@ -22,4 +22,24 @@ public interface CardService extends IService<EasyCard> {
      */
     EasyProject get_project_by_id(Integer id);
 
+    /**
+     * 更新卡片信息
+     * @param cid 卡片id
+     * @param bindImei 绑定设备号
+     * @param bindIp 绑定ip
+     * @param imeiCheck 是否绑定设备
+     * @param ipCheck 是否绑定ip
+     * @param endTime 卡片有效期
+     * @param introduction 卡片介绍
+     * @param coreDate 卡片核心数据
+     * @return boolean
+     */
+    boolean update_card_info(Integer cid, String bindImei, String bindIp, Integer imeiCheck,Integer ipCheck, String endTime, String introduction, String coreDate);
+
+    /**
+     * 卡片封禁
+     * @param cid 卡片id
+     * @return boolean
+     */
+    boolean card_ban(Integer cid);
 }
